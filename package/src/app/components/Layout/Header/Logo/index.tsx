@@ -7,9 +7,9 @@ const Logo: React.FC = () => {
       <Image
         src='/images/Logo/Logo.svg'
         alt='logo'
-        width={34}
-        height={34}
-        className='h-34 w-auto'
+        width={56}
+        height={56}
+        className='w-[56px] h-[56px]'
         quality={100}
       />
       <p className='text-black text-2xl font-semibold leading-tight'>

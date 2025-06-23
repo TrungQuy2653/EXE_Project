@@ -12,71 +12,79 @@ const HeaderData: HeaderItem[] = [
   { label: 'Menu', href: '/#menu' },
   { label: 'Reserve Table', href: '/#reserve' },
   { label: 'Docs', href: '/documentation' },
+  { label: 'Mystery', href: '/#mystery' },
+
 ]
 
 const FeaturesData: FeaturesType[] = [
   {
-    imgSrc: '/images/Features/featureOne.svg',
-    heading: 'Elegant Dining Atmosphere',
+    imgSrc: '/images/Features/feature1.svg',
+    heading: 'Không Đơn Thuần Là Một Mô Hình',
     subheading:
-      'Enjoy a warm, refined space perfect for intimate dinners or small group gatherings.',
+      'Mỗi sản phẩm là một tác phẩm nghệ thuật được đầu tư công phu, kết hợp giữa mỹ học hiện đại và giá trị truyền thống.',
   },
   {
-    imgSrc: '/images/Features/featureThree.svg',
-    heading: 'Signature Chef Creations',
+    imgSrc: '/images/Features/feature2.svg',
+    heading: 'Mỗi Quân Cờ Là Một Câu Chuyện',
     subheading:
-      'Taste one-of-a-kind dishes crafted with passion by our top culinary team.',
+      'Từng mô hình là sự kết tinh của những truyền thuyết lịch sử và văn hóa Việt, được tái hiện sinh động qua thiết kế sáng tạo.',
   },
   {
-    imgSrc: '/images/Features/featureTwo.svg',
-    heading: 'Fresh, Local Ingredients',
+    imgSrc: '/images/Features/feature3.svg',
+    heading: 'Tôn Vinh Bản Sắc Văn Hóa Việt',
     subheading:
-      'We use locally sourced goods daily for unmatched taste and quality.',
+      'Dự án hướng đến việc bảo tồn và lan toả giá trị văn hóa dân tộc thông qua từng chi tiết thiết kế đặc sắc và ý nghĩa.',
   },
   {
-    imgSrc: '/images/Features/featureFour.svg',
-    heading: 'Hassle-Free Reservations',
+    imgSrc: '/images/Features/feature4.svg',
+    heading: 'Trải Nghiệm Sưu Tầm Mới Lạ',
     subheading:
-      'Reserve online in seconds or walk in anytime — we’re ready when you are.',
-  }
+      'Sưu tầm không còn chỉ là sở hữu – đó là hành trình khám phá văn hóa và cảm hứng nghệ thuật trong từng quân cờ.',
+  },
+  {
+    imgSrc: '/images/Features/feature4.svg',
+    heading: 'Trải Nghiệm Sưu Tầm Mới Lạ',
+    subheading:
+      'Sưu tầm không còn chỉ là sở hữu – đó là hành trình khám phá văn hóa và cảm hứng nghệ thuật trong từng quân cờ.',
+  },
 ]
 
 const ExpertChiefData: ExpertChiefType[] = [
   {
     profession: 'Senior Chef',
     name: 'Marco Benton',
-    imgSrc: '/images/Expert/boyone.png',
+    imgSrc: '/models/demo.glb',
   },
   {
     profession: 'Junior Chef',
     name: 'Elena Rivera',
-    imgSrc: '/images/Expert/girl.png',
+    imgSrc: '/models/demo.glb',
   },
   {
     profession: 'Junior Chef',
     name: 'John Doe',
-    imgSrc: '/images/Expert/boytwo.png',
+    imgSrc: '/models/demo.glb',
   },
 ]
 
 const GalleryImagesData: GalleryImagesType[] = [
   {
-    src: '/images/Gallery/foodone.webp',
+    src: '/images/Gallery/1.webp',
     name: 'Caesar Salad(187 Kcal)',
     price: 35,
   },
   {
-    src: '/images/Gallery/foodtwo.webp',
+    src: '/images/Gallery/2.webp',
     name: 'Christmas salad(118 Kcal)',
     price: 17,
   },
   {
-    src: '/images/Gallery/foodthree.webp',
+    src: '/images/Gallery/3.webp',
     name: 'Sauteed mushrooms with pumpkin bowl(238 kcal)',
     price: 45,
   },
   {
-    src: '/images/Gallery/foodfour.webp',
+    src: '/images/Gallery/4.webp',
     name: 'BBQ Chicken Feast Pizza(272 kcal)',
     price: 27,
   },

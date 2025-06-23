@@ -27,7 +27,7 @@ const Features = () => {
   }, [])
 
   return (
-    <section id='features'>
+    <section id='features' className='bg-gray-200 relative'>
       <div className='container'>
         <div className='text-center mb-14'>
           <p className='text-primary text-lg font-normal tracking-widest uppercase'>
@@ -37,16 +37,16 @@ const Features = () => {
             Experience Culture in Every Box
           </h2>
         </div>
-        <div className='grid sm:grid-cols-2 lg:grid-cols-4 gap-y-28 gap-x-6 mt-24'>
+        <div className='grid sm:grid-cols-2 lg:grid-cols-5 gap-y-28 gap-x-6 mt-24'>
           {loading
-            ? Array.from({ length: 4 }).map((_, i) => (
+            ? Array.from({ length: 5 }).map((_, i) => (
               <FeaturesSkeleton key={i} />
             ))
             : features.map((items, i) => (
               <div
                 key={i}
                 className='p-8 relative rounded-3xl bg-linear-to-b from-primary/10 to-white shadow-md hover:scale-105 transition duration-300 ease-in-out hover:cursor-pointer'>
-                <div className='rounded-full flex justify-center absolute -top-[50%] sm:top-[-40%] md:top-[-55%] lg:top-[-35%] left-[0%]'>
+                <div className='rounded-full flex justify-center absolute -top-[15%] sm:top-[-15%] md:top-[-20%] lg:top-[-15%] left-[0%]'>
                   <Image
                     src={items.imgSrc}
                     alt={items.imgSrc}
@@ -63,6 +63,7 @@ const Features = () => {
               </div>
             ))}
         </div>
+
       </div>
     </section>
   )

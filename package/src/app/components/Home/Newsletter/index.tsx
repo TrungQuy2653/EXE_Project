@@ -10,11 +10,12 @@ const Newsletter = () => {
           <div className='md:col-span-7'>
             <div className='m-5 sm:m-10 lg:ml-32 lg:mt-20 lg:mb-20'>
               <p className='text-lg font-normal text-white mb-3 tracking-widest'>
-                NEWSLETTER{' '}
+                Cập nhật{' '}
               </p>
               <h2 className='text-white mb-8'>
-                Subscribe our <br /> newsletter.
+                Đăng ký để nhận thông tin về bộ sưu tập mới.
               </h2>
+
 
               <div>
                 <div className='relative text-white focus-within:text-white flex flex-row-reverse shadow-fi rounded-full'>
@@ -22,7 +23,7 @@ const Newsletter = () => {
                     type='Email address'
                     name='q'
                     className='pl-4 pr-16 py-4 text-sm w-full bg-white text-black rounded-full focus:outline-hidden focus:text-black'
-                    placeholder='john.doe@gmail.com'
+                    placeholder='mystiteam.contact@gmail.com'
                     autoComplete='off'
                   />
                   <div className='absolute inset-y-0 right-0 flex items-center pr-2'>
@@ -44,30 +45,30 @@ const Newsletter = () => {
           <div className='md:col-span-5 relative hidden md:block'>
             <div>
               <Image
-                src={'/images/Newsletter/soup.webp'}
-                alt='soup-image'
+                src={'/images/Newsletter/chessboard.webp'}
+                alt='chessboard-image'
                 width={626}
                 height={602}
                 className='-mt-24'
               />
             </div>
-            <div className='absolute top-[78%]'>
+            <div className='absolute top-[35%]'>
               <Image
-                src={'/images/Newsletter/onion.webp'}
+                src={'/images/Newsletter/chess1.webp'}
                 alt='onion-image'
                 width={300}
                 height={122}
               />
             </div>
-            <div className='absolute top-[30%] right-[-23%]'>
+            <div className='absolute top-[40%] right-[-40%]'>
               <Image
-                src={'/images/Newsletter/lec.webp'}
+                src={'/images/Newsletter/chess2.webp'}
                 alt='lettuce-image'
                 width={300}
                 height={122}
               />
             </div>
-            <div className='absolute bottom-[10%] left-[0%]'>
+            <div className='absolute bottom-[10%] -left-[143%]'>
               <Image
                 src={'/images/Newsletter/yellow.svg'}
                 alt='yellow-image'

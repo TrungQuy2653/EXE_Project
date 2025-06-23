@@ -5,11 +5,11 @@ import Cook from '@/app/components/Home/Cook'
 import Expert from '@/app/components/Home/Expert'
 import Gallery from '@/app/components/Home/Gallery'
 import Newsletter from '@/app/components/Home/Newsletter'
-import CaseOpening from '@/app/components/CaseOpening'
+import Mystery from '@/app/components/Home/Mystery'
 import { Metadata } from 'next'
 import ContactForm from './components/Contact/Form'
 export const metadata: Metadata = {
-  title: 'Kitchen',
+  title: 'Kỳ Vương Sưu Tầm',
 }
 
 export default function Home() {
@@ -19,11 +19,10 @@ export default function Home() {
       <Features />
       <Cook />
       <Expert />
+      <Mystery />
       <Gallery />
       <ContactForm />
       <Newsletter />
-      <CaseOpening />
-
     </main>
   )
 }

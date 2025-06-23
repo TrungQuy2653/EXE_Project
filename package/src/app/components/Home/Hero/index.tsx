@@ -2,15 +2,14 @@
 'use client'
 
 import { useState } from 'react'
-import SpinPopup from '@/app/components/SpinWheel'
 import Link from 'next/link'
 import Image from 'next/image'
+import Spline from '@splinetool/react-spline/next';
 
 const Hero = () => {
-  const [showPopup, setShowPopup] = useState(false)
 
   return (
-    <section id='home-section' className='bg-gray-50 relative'>
+    <section id='home-section'>
       <div className='container xl:pt-7 pt-16'>
         <div className='grid grid-cols-1 lg:grid-cols-12 items-center'>
           <div className='lg:col-span-6'>
@@ -26,12 +25,14 @@ const Hero = () => {
                   Our Product
                 </button>
               </Link>
-              <button
-                onClick={() => setShowPopup(true)}
-                className='text-xl border border-primary rounded-full font-medium py-3 px-8 text-primary hover:text-white hover:bg-primary hover:cursor-pointer transition ease-in-out duration-300'
-              >
-                Open Mystery
-              </button>
+              <Link href='/#mystery'>
+                <button
+                  className='text-xl border border-primary rounded-full font-medium py-3 px-8 text-primary hover:text-white hover:bg-primary hover:cursor-pointer transition ease-in-out duration-300'
+                >
+                  Open Mystery
+                </button>
+              </Link>
+
             </div>
           </div>
 
@@ -56,8 +57,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-
-      {showPopup && <SpinPopup onClose={() => setShowPopup(false)} />}
     </section>
   )
 }
