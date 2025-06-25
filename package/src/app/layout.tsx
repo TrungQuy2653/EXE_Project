@@ -1,11 +1,11 @@
-import { Roboto  } from 'next/font/google'
+import { Merienda  } from 'next/font/google'
 import './globals.css'
 import Header from '@/app/components/Layout/Header'
 import Footer from '@/app/components/Layout/Footer'
 import ScrollToTop from '@/app/components/ScrollToTop'
-const font = Roboto ({
+const font = Merienda ({
   subsets: ['vietnamese'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400'],
 })
 
 export default function RootLayout({

@@ -17,19 +17,19 @@ const Hero = () => {
               Unbox the mystery, collect the culture.
             </h1>
             <p className='text-black/55 text-lg font-normal mb-10 lg:text-start text-center'>
-              Explore a world of blind box collectibles inspired by Vietnamese stories, legends, and traditions.
+              Khám phá thế giới mô hình cờ vua mang cảm hứng từ những câu chuyện, truyền thuyết và truyền thống Việt Nam.
             </p>
             <div className='flex flex-col sm:flex-row gap-5 items-center justify-center lg:justify-start'>
-              <Link href='/#menu'>
+              <Link href='/#product'>
                 <button className='text-xl font-medium rounded-full text-white py-3 px-8 bg-primary hover:text-primary border border-primary hover:bg-transparent hover:cursor-pointer transition ease-in-out duration-300'>
-                  Our Product
+                  Xem Thêm
                 </button>
               </Link>
               <Link href='/#mystery'>
                 <button
                   className='text-xl border border-primary rounded-full font-medium py-3 px-8 text-primary hover:text-white hover:bg-primary hover:cursor-pointer transition ease-in-out duration-300'
                 >
-                  Open Mystery
+                  Mở Ngay
                 </button>
               </Link>
 
@@ -37,7 +37,7 @@ const Hero = () => {
           </div>
 
           <div className='lg:col-span-6 flex justify-center relative'>
-            <div className='flex bg-white p-2 gap-5 items-center bottom-10 left-10 rounded-xl absolute'>
+            <div className='flex bg-white p-2 gap-2 items-center bottom-10 left-10 rounded-xl absolute'>
               <Image
                 src='/images/hero/chess.webp'
                 alt='chess-image'
@@ -45,7 +45,7 @@ const Hero = () => {
                 height={68}
               />
               <p className='text-lg font-normal'>
-                More than Chess <br /> It's a Culture
+                Không chỉ là cờ vua <br />Đó là một nền văn hoá
               </p>
             </div>
             <Image

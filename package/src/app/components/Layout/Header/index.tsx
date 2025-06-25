@@ -1,17 +1,19 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import Logo from './Logo'
 import HeaderLink from './Navigation/HeaderLink'
 import MobileHeaderLink from './Navigation/MobileHeaderLink'
-import Signin from '@/app/components/Auth/SignIn'
+import SignIn from '@/app/components/Auth/SignIn'
 import SignUp from '@/app/components/Auth/SignUp'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { HeaderItem } from '@/app/types/menu'
 
 const Header: React.FC = () => {
   const [headerLink, setHeaderLink] = useState<HeaderItem[]>([])
+  const router = useRouter()
 
   const [navbarOpen, setNavbarOpen] = useState(false)
   const [sticky, setSticky] = useState(false)
@@ -82,9 +84,8 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 z-40 py-4 w-full transition-all duration-300 ${
-        sticky ? 'shadow-lg bg-white' : 'shadow-none'
-      }`}>
+      className={`fixed top-0 z-40 py-4 w-full transition-all duration-300 ${sticky ? 'shadow-lg bg-white' : 'shadow-none'
+        }`}>
       <div>
         <div className='container flex items-center justify-between'>
           <div>
@@ -103,14 +104,14 @@ const Header: React.FC = () => {
                 icon='solar:phone-bold'
                 className='text-primary text-3xl lg:text-2xl inline-block me-2'
               />
-              +1(909) 235-9814
+              (+84) 989999999
             </Link>
             <button
               className='hidden lg:block text-primary duration-300 bg-primary/15 hover:text-white hover:bg-primary font-medium text-lg py-2 px-6 rounded-full hover:cursor-pointer'
               onClick={() => {
                 setIsSignInOpen(true)
               }}>
-              Sign In
+              Đăng Nhập
             </button>
             {isSignInOpen && (
               <div className='fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
@@ -128,7 +129,32 @@ const Header: React.FC = () => {
                       className='text-black hover:text-primary text-24 inline-block me-2'
                     />
                   </button>
-                  <Signin />
+                  <div>
+                    <Logo />
+                  </div>
+                  <SignIn />
+
+                  <span
+                    onClick={() => {
+                      setIsSignInOpen(false)
+                      router.push('/forgotpassword')
+                    }}
+                    className='mb-2 inline-block text-base text-black hover:text-primary hover:underline cursor-pointer'
+                  >
+                    Quên mật khẩu?
+                  </span>
+                  <p className="text-black text-base">
+                    Bạn chưa có tài khoản?{' '}
+                    <span
+                      onClick={() => {
+                        setIsSignInOpen(false)
+                        setIsSignUpOpen(true)
+                      }}
+                      className="text-primary hover:underline cursor-pointer"
+                    >
+                      Đăng ký ngay
+                    </span>
+                  </p>
                 </div>
               </div>
             )}
@@ -137,7 +163,7 @@ const Header: React.FC = () => {
               onClick={() => {
                 setIsSignUpOpen(true)
               }}>
-              Sign Up
+              Đăng Ký
             </button>
             {isSignUpOpen && (
               <div className='fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
@@ -155,7 +181,33 @@ const Header: React.FC = () => {
                       className='text-black hover:text-primary text-24 inline-block me-2'
                     />
                   </button>
+                  <div>
+                    <Logo />
+                  </div>
                   <SignUp />
+                  <p className='text-body-secondary mb-4 text-black/60 text-base'>
+                    Khi tạo tài khoản, bạn đồng ý với{' '}
+                    <a href='/' className='hover:underline'>
+                      Chính sách bảo mật
+                    </a>{' '}
+                    và{' '}
+                    <a href='/' className='hover:underline'>
+                      Điều khoản sử dụng
+                    </a>.
+                  </p>
+
+                  <p className="text-black text-base">
+                    Bạn đã có tài khoản?{' '}
+                    <span
+                      onClick={() => {
+                        setIsSignInOpen(true)
+                        setIsSignUpOpen(false)
+                      }}
+                      className="text-primary hover:underline cursor-pointer"
+                    >
+                      Đăng nhập
+                    </span>
+                  </p>
                 </div>
               </div>
             )}
@@ -174,9 +226,8 @@ const Header: React.FC = () => {
         )}
         <div
           ref={mobileMenuRef}
-          className={`lg:hidden fixed top-0 right-0 h-full w-full bg-white shadow-lg transform transition-transform duration-300 max-w-xs ${
-            navbarOpen ? 'translate-x-0' : 'translate-x-full'
-          } z-50`}>
+          className={`lg:hidden fixed top-0 right-0 h-full w-full bg-white shadow-lg transform transition-transform duration-300 max-w-xs ${navbarOpen ? 'translate-x-0' : 'translate-x-full'
+            } z-50`}>
           <div className='flex items-center justify-between gap-2 p-4'>
             <div>
               <Logo />
@@ -201,7 +252,7 @@ const Header: React.FC = () => {
               icon='solar:phone-bold'
               className='text-primary text-3xl lg:text-2xl inline-block me-2'
             />
-            +1(909) 235-9814
+            (+84) 989999999
           </Link>
           <nav className='flex flex-col items-start p-4'>
             {headerLink.map((item, index) => (
@@ -214,7 +265,7 @@ const Header: React.FC = () => {
                   setIsSignInOpen(true)
                   setNavbarOpen(false)
                 }}>
-                Sign In
+                Đang Nhập
               </button>
               <button
                 className='bg-primary text-white px-4 py-2 rounded-lg border  border-primary hover:text-primary hover:bg-transparent hover:cursor-pointer transition duration-300 ease-in-out'
@@ -222,13 +273,13 @@ const Header: React.FC = () => {
                   setIsSignUpOpen(true)
                   setNavbarOpen(false)
                 }}>
-                Sign Up
+                Đăng Ký
               </button>
             </div>
           </nav>
         </div>
       </div>
-    </header>
+    </header >
   )
 }
 

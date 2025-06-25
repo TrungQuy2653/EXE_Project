@@ -27,14 +27,14 @@ const Features = () => {
   }, [])
 
   return (
-    <section id='features' className='bg-gray-200 relative'>
+    <section id='features' className='bg-primary/10 relative'>
       <div className='container'>
         <div className='text-center mb-14'>
           <p className='text-primary text-lg font-normal tracking-widest uppercase'>
-            Why Choose Us
+            Điều gì khiến chúng tôi khác biệt?
           </p>
           <h2 className='font-semibold lg:max-w-60% mx-auto mt-3'>
-            Experience Culture in Every Box
+            Khám phá văn hoá trong từng hộp quà
           </h2>
         </div>
         <div className='grid sm:grid-cols-2 lg:grid-cols-5 gap-y-28 gap-x-6 mt-24'>
@@ -46,11 +46,11 @@ const Features = () => {
               <div
                 key={i}
                 className='p-8 relative rounded-3xl bg-linear-to-b from-primary/10 to-white shadow-md hover:scale-105 transition duration-300 ease-in-out hover:cursor-pointer'>
-                <div className='rounded-full flex justify-center absolute -top-[15%] sm:top-[-15%] md:top-[-20%] lg:top-[-15%] left-[0%]'>
+                <div className='rounded-full flex justify-center absolute -top-[15%] sm:top-[-15%] md:top-[-20%] lg:top-[-15%] left-[5%]'>
                   <Image
                     src={items.imgSrc}
                     alt={items.imgSrc}
-                    width={510}
+                    width={200}
                     height={10}
                   />
                 </div>

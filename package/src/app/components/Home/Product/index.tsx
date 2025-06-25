@@ -172,7 +172,7 @@ const Expert = () => {
   }
 
   return (
-    <section className="bg-primary/10">
+    <section id='product' className="bg-primary/10">
       <div className="container">
         <div className="text-center">
           <p className="text-primary text-lg font-normal mb-3 tracking-widest uppercase">

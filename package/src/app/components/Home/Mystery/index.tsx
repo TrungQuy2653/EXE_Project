@@ -16,7 +16,7 @@ export default function CaseOpening() {
   ]
 
   const ITEM_WIDTH = 300
-  const SPIN_DURATION = 20_000 // 10 giây
+  const SPIN_DURATION = 10_000 // 10 giây
 
   const startOpening = () => {
     if (!containerRef.current) return
@@ -103,7 +103,7 @@ export default function CaseOpening() {
             disabled={spinning}
             className='mt-10 px-6 py-2 border border-primary rounded-full text-base font-medium text-white bg-primary hover:bg-primary/20 hover:text-primary hover:cursor-pointer transition ease-in-out duration-300'
           >
-            {spinning ? 'Đang mở trong 10s...' : 'Mở hòm'}
+            {spinning ? 'Quay...Quay...Quay....' : 'Mở hòm'}
           </button>
 
 

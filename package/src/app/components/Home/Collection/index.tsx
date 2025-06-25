@@ -35,59 +35,59 @@ const Gallery = () => {
   }, [])
 
   return (
-    <section id='menu' className='scroll-mt-20'>
+    <section id='collection' className='scroll-mt-20'>
       <div className='container'>
         <div className='text-center'>
           <p className='text-primary text-lg font-normal mb-3 tracking-widest uppercase'>
-            Our Menu
+            Bộ sưu tập
           </p>
-          <h2>Explore Our Signature Dishes</h2>
+          <h2>Các bộ sưu tập mới nhất</h2>
         </div>
         <div className='my-16 px-6'>
           <Masonry
-            breakpointCols={{ default: 2, '700': 2, '500': 1 }}
+            breakpointCols={{ default: 1, '700': 1, '500': 1 }}
             className='flex gap-6'
             columnClassName='masonry-column'>
             {/* Map through images */}
             {loading
               ? Array.from({ length: 4 }).map((_, i) => (
-                  <GalleryImagesSkeleton key={i} />
-                ))
+                <GalleryImagesSkeleton key={i} />
+              ))
               : galleryImages.map((item, index) => (
-                  <div
-                    key={index}
-                    className='overflow-hidden rounded-3xl mb-6 relative group'>
-                    <Image
-                      src={item.src}
-                      alt={item.name}
-                      width={600}
-                      height={500}
-                      className='object-cover w-full h-full'
-                    />
-                    <div className='w-full h-full absolute bg-black/40 top-full group-hover:top-0 duration-500 lg:p-12 md:p-8 p-3.5 flex flex-col items-start lg:gap-8 gap-4 justify-end'>
+                <div
+                  key={index}
+                  className=" overflow-hidden rounded-3xl mb-6 relative group">
+                  <Image
+                    src={item.src}
+                    alt={item.name}
+                    width={600}
+                    height={500}
+                    className='object-cover w-full h-full'
+                  />
+                  <div className='w-full h-full absolute bg-black/40 top-full group-hover:top-0 duration-500 lg:p-12 md:p-8 p-3.5 flex flex-col items-start lg:gap-8 gap-4 justify-end'>
+                    <p className='text-white lg:text-2xl text-xl'>
+                      {item.name}
+                    </p>
+                    <div className='flex items-center justify-between w-full'>
                       <p className='text-white lg:text-2xl text-xl'>
-                        {item.name}
+                        $ {item.price}
                       </p>
-                      <div className='flex items-center justify-between w-full'>
-                        <p className='text-white lg:text-2xl text-xl'>
-                          $ {item.price}
-                        </p>
-                        <Link
-                          href='#'
-                          className='text-white rounded-full bg-primary border duration-300 border-primary py-2 lg:px-6 md:px-4 px-3 hover:bg-primary/40 hover:backdrop-blur-xs md:text-base text-sm'>
-                          Learn More
-                        </Link>
-                      </div>
+                      <Link
+                        href='#'
+                        className='text-white rounded-full bg-primary border duration-300 border-primary py-2 lg:px-6 md:px-4 px-3 hover:bg-primary/40 hover:backdrop-blur-xs md:text-base text-sm'>
+                        Learn More
+                      </Link>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
           </Masonry>
         </div>
         <div className='flex justify-center'>
           <button
             className='px-6 py-2 border border-primary rounded-full text-base font-medium text-white bg-primary hover:bg-primary/20 hover:text-primary hover:cursor-pointer transition ease-in-out duration-300'
             onClick={openMenu}>
-            View More
+            Xem Thêm
           </button>
           {/* menu pop-up */}
           {isMenuOpen && (

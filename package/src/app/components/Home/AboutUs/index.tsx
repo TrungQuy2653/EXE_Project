@@ -25,7 +25,7 @@ const Cook = () => {
           </div>
           <div className='lg:col-span-6 flex flex-col justify-center items-center lg:items-start'>
             <p className='text-primary text-lg font-normal mb-3 tracking-widest uppercase lg:text-start text-center'>
-              About Us
+              Nhóm phát triển
             </p>
             <h2 className='lg:text-start text-center'>
               MistyTeam
@@ -43,7 +43,7 @@ const Cook = () => {
               onClick={() => window.open("https://www.facebook.com", "_blank")}
               className='text-xl font-medium rounded-full text-white py-3 px-8 duration-300 bg-primary w-fit border border-primary hover:bg-transparent hover:text-primary hover:cursor-pointer'
             >
-              Contact Us
+              Liên Hệ Với Chúng Tôi
             </button>
           </div>
         </div>

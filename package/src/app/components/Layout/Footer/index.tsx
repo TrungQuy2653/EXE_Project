@@ -24,7 +24,7 @@ const Footer: FC = () => {
   }, [])
 
   return (
-    <footer className='pt-8'>
+    <footer className='bg-primary/10 pt-8'>
       <div className='container'>
         <div className='grid grid-cols-1 sm:grid-cols-6 lg:gap-20 md:gap-24 sm:gap-12 gap-12 pb-10'>
           <div className='col-span-2'>

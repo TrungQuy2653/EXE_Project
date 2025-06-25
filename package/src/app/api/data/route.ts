@@ -8,11 +8,9 @@ import { FooterLinkType } from '@/app/types/footerlink'
 import { FullMenuType } from '@/app/types/fullmenu'
 
 const HeaderData: HeaderItem[] = [
-  { label: 'About Us', href: '/#aboutus' },
-  { label: 'Menu', href: '/#menu' },
-  { label: 'Reserve Table', href: '/#reserve' },
+  { label: 'Sản Phẩm', href: '/#product' },
   { label: 'Docs', href: '/documentation' },
-  { label: 'Mystery', href: '/#mystery' },
+  { label: 'Mở Ngay', href: '/#mystery' },
 
 ]
 
@@ -42,10 +40,10 @@ const FeaturesData: FeaturesType[] = [
       'Sưu tầm không còn chỉ là sở hữu – đó là hành trình khám phá văn hóa và cảm hứng nghệ thuật trong từng quân cờ.',
   },
   {
-    imgSrc: '/images/Features/feature4.svg',
-    heading: 'Trải Nghiệm Sưu Tầm Mới Lạ',
+    imgSrc: '/images/Features/feature5.svg',
+    heading: 'Kết Nối Cộng Đồng Qua Sưu Tầm',
     subheading:
-      'Sưu tầm không còn chỉ là sở hữu – đó là hành trình khám phá văn hóa và cảm hứng nghệ thuật trong từng quân cờ.',
+      'Mỗi người sưu tầm là một mảnh ghép trong hành trình gìn giữ và chia sẻ văn hóa – cùng nhau tạo nên một cộng đồng đam mê và gắn kết.',
   },
 ]
 
@@ -69,24 +67,14 @@ const ExpertChiefData: ExpertChiefType[] = [
 
 const GalleryImagesData: GalleryImagesType[] = [
   {
-    src: '/images/Gallery/1.webp',
-    name: 'Caesar Salad(187 Kcal)',
-    price: 35,
+    src: '/images/Gallery/ai1.webp',
+    name: 'Hào Khí Lạc Việt',
+    price: 350,
   },
   {
-    src: '/images/Gallery/2.webp',
-    name: 'Christmas salad(118 Kcal)',
+    src: '/images/Gallery/ai2.webp',
+    name: 'Coming Soon',
     price: 17,
-  },
-  {
-    src: '/images/Gallery/3.webp',
-    name: 'Sauteed mushrooms with pumpkin bowl(238 kcal)',
-    price: 45,
-  },
-  {
-    src: '/images/Gallery/4.webp',
-    name: 'BBQ Chicken Feast Pizza(272 kcal)',
-    price: 27,
   },
 ]
 

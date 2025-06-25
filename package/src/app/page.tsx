@@ -1,9 +1,9 @@
 import React from 'react'
 import Hero from '@/app/components/Home/Hero'
 import Features from '@/app/components/Home/Features'
-import Cook from '@/app/components/Home/Cook'
-import Expert from '@/app/components/Home/Expert'
-import Gallery from '@/app/components/Home/Gallery'
+import AboutUs from '@/app/components/Home/AboutUs'
+import Product from '@/app/components/Home/Product'
+import Collection from '@/app/components/Home/Collection'
 import Newsletter from '@/app/components/Home/Newsletter'
 import Mystery from '@/app/components/Home/Mystery'
 import { Metadata } from 'next'
@@ -17,11 +17,11 @@ export default function Home() {
     <main>
       <Hero />
       <Features />
-      <Cook />
-      <Expert />
+      <Collection />
+      <Product />
+      <AboutUs />
       <Mystery />
-      <Gallery />
-      <ContactForm />
+      {/* <ContactForm /> */}
       <Newsletter />
     </main>
   )
