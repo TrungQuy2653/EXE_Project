@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server'
 
 import { HeaderItem } from '@/app/types/menu'
 import { FeaturesType } from '@/app/types/features'
-import { ExpertChiefType } from '@/app/types/expertchief'
-import { GalleryImagesType } from '@/app/types/galleryimage'
+import { CollectionType } from '@/app/types/collection'
 import { FooterLinkType } from '@/app/types/footerlink'
 import { FullMenuType } from '@/app/types/fullmenu'
+import { ProductType } from '@/app/types/product'
 
 const HeaderData: HeaderItem[] = [
   { label: 'Sản Phẩm', href: '/#product' },
@@ -47,34 +47,16 @@ const FeaturesData: FeaturesType[] = [
   },
 ]
 
-const ExpertChiefData: ExpertChiefType[] = [
+const CollectionData: CollectionType[] = [
   {
-    profession: 'Senior Chef',
-    name: 'Marco Benton',
-    imgSrc: '/models/demo.glb',
-  },
-  {
-    profession: 'Junior Chef',
-    name: 'Elena Rivera',
-    imgSrc: '/models/demo.glb',
-  },
-  {
-    profession: 'Junior Chef',
-    name: 'John Doe',
-    imgSrc: '/models/demo.glb',
-  },
-]
-
-const GalleryImagesData: GalleryImagesType[] = [
-  {
-    src: '/images/Gallery/ai1.webp',
+    imgSrc: '/images/Gallery/ai3.webp',
     name: 'Hào Khí Lạc Việt',
     price: 350,
   },
   {
-    src: '/images/Gallery/ai2.webp',
+    imgSrc: '/images/Gallery/ai3.webp',
     name: 'Coming Soon',
-    price: 17,
+    price: 350,
   },
 ]
 
@@ -141,13 +123,48 @@ const FooterLinkData: FooterLinkType[] = [
   },
 ]
 
+export const ProductData: ProductType[] = [
+  {
+    id: 1,
+    name: 'Âu Lạc Vương',
+    description: 'Tượng mô phỏng vị vua tối cao của Văn Lang, oai nghiêm và đầy uy quyền.',
+    imgSrc: '/images/Product/demo.png',
+  },
+  {
+    id: 2,
+    name: 'Lạc Nữ Thủ Lĩnh',
+    description: 'Biểu tượng cho hình mẫu phụ nữ quyền lực thời Văn Lang, mang vẻ đẹp mạnh mẽ mà dịu dàng.',
+    imgSrc: '/images/Product/demo.png',
+  },
+  {
+    id: 3,
+    name: 'Lạc Tướng Vệ Quốc',
+    description: 'Tượng tướng quân can đảm, chỉ huy đoàn binh bảo vệ non sông Văn Lang.',
+    imgSrc: '/images/Product/demo.png',
+  },
+  {
+    id: 4,
+    name: 'Chiến Xa Lạc Hồng',
+    description: 'Tái hiện hình ảnh xe chiến đấu hùng dũng, mang khí thế của tổ tiên Lạc Hồng.',
+    imgSrc: '/images/Product/demo.png',
+  },
+  {
+    id: 5,
+    name: 'Kỵ Binh Âu Cơ',
+    description: 'Chiến mã của Âu Cơ, đại diện cho sự kiên cường, lanh lợi nơi trận mạc.',
+    imgSrc: '/images/Product/demo.png',
+  },
+]
+
+
+
 export const GET = () => {
   return NextResponse.json({
     HeaderData,
     FeaturesData,
-    ExpertChiefData,
-    GalleryImagesData,
+    CollectionData,
     FullMenuData,
     FooterLinkData,
+    ProductData,
   })
 }

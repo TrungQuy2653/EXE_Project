@@ -1,5 +1,5 @@
 'use client'
-
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -91,7 +91,7 @@ const Header: React.FC = () => {
           <div>
             <Logo />
           </div>
-          <nav className='hidden lg:flex grow items-center gap-4 xl:gap-6  justify-center'>
+          <nav className='hidden lg:flex grow items-center gap-4 xl:gap-6 justify-center'>
             {headerLink.map((item, index) => (
               <HeaderLink key={index} item={item} />
             ))}
@@ -106,13 +106,21 @@ const Header: React.FC = () => {
               />
               (+84) 989999999
             </Link>
-            <button
-              className='hidden lg:block text-primary duration-300 bg-primary/15 hover:text-white hover:bg-primary font-medium text-lg py-2 px-6 rounded-full hover:cursor-pointer'
-              onClick={() => {
-                setIsSignInOpen(true)
-              }}>
-              Đăng Nhập
-            </button>
+            <div
+              onClick={() => setIsSignInOpen(true)}
+              className="relative w-[225px] h-[75px] cursor-pointer hover:opacity-80 transition hidden lg:block"
+            >
+              <Image
+                src="/images/Button/primary.png"
+                alt="Đăng Nhập"
+                layout="fill"
+                objectFit="cover"
+                className="rounded"
+              />
+              <span className="absolute inset-0 flex items-center justify-center text-text text-xl font-semibold">
+                Đăng Nhập
+              </span>
+            </div>
             {isSignInOpen && (
               <div className='fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
                 <div
@@ -158,13 +166,21 @@ const Header: React.FC = () => {
                 </div>
               </div>
             )}
-            <button
-              className='hidden lg:block bg-primary duration-300 text-white hover:bg-primary/15 hover:text-primary font-medium text-lg py-2 px-6 rounded-full hover:cursor-pointer'
-              onClick={() => {
-                setIsSignUpOpen(true)
-              }}>
-              Đăng Ký
-            </button>
+            <div
+              onClick={() => setIsSignUpOpen(true)}
+              className="relative w-[225px] h-[75px] cursor-pointer hover:opacity-80 transition hidden lg:block"
+            >
+              <Image
+                src="/images/Button/primary.png" // <-- đổi thành ảnh nút Đăng Ký nếu có
+                alt="Đăng Ký"
+                layout="fill"
+                objectFit="cover"
+                className="rounded"
+              />
+              <span className="absolute inset-0 flex items-center justify-center text-text text-xl font-semibold">
+                Đăng Ký
+              </span>
+            </div>
             {isSignUpOpen && (
               <div className='fixed top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center z-50'>
                 <div

@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import GalleryImagesSkeleton from '../../Skeleton/GalleryImages'
 import { Icon } from '@iconify/react'
-import { GalleryImagesType } from '@/app/types/galleryimage'
+import { CollectionType } from '@/app/types/collection'
 import { FullMenuType } from '@/app/types/fullmenu'
 
 const Gallery = () => {
-  const [galleryImages, setGalleryImages] = useState<GalleryImagesType[]>([])
+  const [galleryImages, setGalleryImages] = useState<CollectionType[]>([])
   const [fullMenu, setFullMenu] = useState<FullMenuType[]>([])
   const [loading, setLoading] = useState(true)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -23,7 +23,7 @@ const Gallery = () => {
         const res = await fetch('/api/data')
         if (!res.ok) throw new Error('Failed to fetch')
         const data = await res.json()
-        setGalleryImages(data.GalleryImagesData)
+        setGalleryImages(data.CollectionData)
         setFullMenu(data.FullMenuData)
       } catch (error) {
         console.error('Error fetching services:', error)
@@ -41,7 +41,7 @@ const Gallery = () => {
           <p className='text-primary text-lg font-normal mb-3 tracking-widest uppercase'>
             Bộ sưu tập
           </p>
-          <h2>Các bộ sưu tập mới nhất</h2>
+          <h2>Các bộ sưu tập mới</h2>
         </div>
         <div className='my-16 px-6'>
           <Masonry
@@ -58,7 +58,7 @@ const Gallery = () => {
                   key={index}
                   className=" overflow-hidden rounded-3xl mb-6 relative group">
                   <Image
-                    src={item.src}
+                    src={item.imgSrc}
                     alt={item.name}
                     width={600}
                     height={500}
@@ -73,7 +73,7 @@ const Gallery = () => {
                         $ {item.price}
                       </p>
                       <Link
-                        href='#'
+                        href='/collection'
                         className='text-white rounded-full bg-primary border duration-300 border-primary py-2 lg:px-6 md:px-4 px-3 hover:bg-primary/40 hover:backdrop-blur-xs md:text-base text-sm'>
                         Learn More
                       </Link>

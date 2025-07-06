@@ -3,8 +3,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-primary:#0052CC;
+  --color-primary:#b77c0e;
   --color-grey: #363636;
+  --color-text: #F8D48A;
+  --color-secondary: #112317;
 
   --spacing-60\%: 60%;
   --spacing-70\%: 70%;
