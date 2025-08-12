@@ -64,7 +64,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode }) => {
        }, 1000);
      } catch (err: any) {
        console.error('❌ Auth error:', err);
-       setError(err.message);
+       // Hiển thị lỗi chi tiết hơn
+       if (err.message) {
+         setError(err.message);
+       } else if (err.errors && Array.isArray(err.errors)) {
+         setError(err.errors.join(', '));
+       } else {
+         setError('Có lỗi xảy ra, vui lòng thử lại');
+       }
      } finally {
        setLoading(false);
      }

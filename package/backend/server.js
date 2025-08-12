@@ -35,7 +35,7 @@ app.post('/api/register', async (req, res) => {
   try {
     console.log('📝 Register request received:', req.body);
     
-    const { username, email, password, confirmPassword } = req.body;
+    const { username, email, password, confirmpassword } = req.body;
 
     // Validation
     if (!username || !email || !password || !confirmPassword) {
@@ -44,7 +44,7 @@ app.post('/api/register', async (req, res) => {
       });
     }
 
-    if (password !== confirmPassword) {
+    if (password !== confirmpassword) {
       return res.status(400).json({
         error: 'Mật khẩu xác nhận không khớp'
       });

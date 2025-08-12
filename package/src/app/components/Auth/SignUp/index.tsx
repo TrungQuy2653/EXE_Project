@@ -43,7 +43,7 @@ const SignUp = () => {
           <input
             type='password'
             placeholder='Xác nhận mật khẩu'
-            name='confirmPassword'
+                            name='confirmpassword'
             required
             className='w-full rounded-md border border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition border-gray-200 placeholder:text-black/30 focus:border-primary focus-visible:shadow-none text-black'
           />

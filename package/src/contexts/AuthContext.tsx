@@ -76,6 +76,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await apiService.login(email, password);
       console.log('🔐 Login response:', response);
       
+      // Kiểm tra response format
+      if (!response || !response.token || !response.data) {
+        throw new Error('Response không đúng format từ server');
+      }
+      
       // Backend trả về { token, data: { id, username, email, role } }
       const { token: authToken, data: userData } = response;
       
@@ -106,6 +111,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       const response = await apiService.register({ username, email, password, confirmpassword });
       console.log('✅ Registration response:', response);
+      
+      // Kiểm tra response format
+      if (!response || !response.data || !response.token) {
+        throw new Error('Response không đúng format từ server');
+      }
       
       // Backend trả về { message, data: { id, username, email, role }, token }
       const { data: userData, token: authToken } = response;
