@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "start": "node --experimental-modules server.js",
+    "server": "node --experimental-modules server.js",
+    "simple": "node --experimental-modules server.js"
   },
   "keywords": [],
   "author": "",

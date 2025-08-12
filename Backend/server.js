@@ -1,9 +1,9 @@
 import express from "express";
-import { connectionDB } from "./config/db.js";
+import { connectionDB } from "./src/config/db.js";
 import dotenv from "dotenv";
-import authRouter from './routers/auth.js';
-import productRouter from './routers/product.js';
-import businessRouter from './routers/business.js';
+import authRouter from './src/routers/auth.js';
+import productRouter from './src/routers/product.js';
+import businessRouter from './src/routers/business.js';
 import cors from 'cors';
 
 dotenv.config();
@@ -63,18 +63,13 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Chạy server nếu file được execute trực tiếp hoặc không có import.meta
-if (typeof import.meta === 'undefined' || import.meta.url === `file://${process.argv[1]}`) {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log('🚀 ========================================');
-    console.log(`✅ Server đang chạy tại port ${PORT}`);
-    console.log(`🌐 Health check: http://localhost:${PORT}/health`);
-    console.log(`🔌 API health check: http://localhost:${PORT}/api/health`);
-    console.log(`📱 Frontend URL: http://localhost:3000`);
-    console.log('🚀 ========================================');
-  });
-}
-
-// Export cho Vite
-export const viteNodeApp = app; 
+// Chạy server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log('🚀 ========================================');
+  console.log(`✅ Server đang chạy tại port ${PORT}`);
+  console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+  console.log(`🔌 API health check: http://localhost:${PORT}/api/health`);
+  console.log(`📱 Frontend URL: http://localhost:3000`);
+  console.log('🚀 ========================================');
+});
