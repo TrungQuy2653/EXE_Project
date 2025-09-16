@@ -4,6 +4,9 @@ import dotenv from "dotenv";
 import authRouter from './routers/auth.js';
 import productRouter from './routers/product.js';
 import businessRouter from './routers/business.js';
+import bannerRouter from './routers/banner.js';
+import chessPieceRouter from './routers/chessPiece.js';
+import mysteryBoxRouter from './routers/mysteryBox.js';
 import cors from 'cors';
 
 dotenv.config();
@@ -24,6 +27,15 @@ app.use(cors({
 // Thêm middleware để parse JSON body
 app.use(express.json());
 
+// Serve static files từ thư mục uploads
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  console.log('📁 Serving static file:', req.path);
+  next();
+}, express.static('uploads'));
+
 //connectdb
 const DB_URI = process.env.DB_URI || 'mongodb://localhost:27017/exe_project';
 console.log("DB_URI thực tế:", DB_URI);
@@ -38,6 +50,9 @@ console.log("Đã gọi hàm connectionDB");
 app.use("/api", authRouter);
 app.use("/api/products", productRouter);
 app.use("/api/business", businessRouter);
+app.use("/api/banners", bannerRouter);
+app.use("/api/chess-pieces", chessPieceRouter);
+app.use("/api/mystery-box", mysteryBoxRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -58,10 +73,34 @@ app.get('/api/health', (req, res) => {
     endpoints: {
       auth: '/api/signup, /api/signin, /api/logout',
       products: '/api/products',
-      business: '/api/business'
+      business: '/api/business',
+      banners: '/api/banners/*',
+      chessPieces: '/api/chess-pieces/*',
+      mysteryBox: '/api/mystery-box/*'
     }
   });
 });
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('❌ Unhandled error:', err);
+  res.status(500).json({
+    success: false,
+    message: 'Lỗi server nội bộ',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Đã xảy ra lỗi'
+  });
+});
+
+// 404 handler - đảm bảo trả về JSON thay vì HTML
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'API endpoint không tồn tại',
+    path: req.originalUrl,
+    method: req.method
+  });
+});
+
 
 // Chạy server nếu file được execute trực tiếp hoặc không có import.meta
 if (typeof import.meta === 'undefined' || import.meta.url === `file://${process.argv[1]}`) {

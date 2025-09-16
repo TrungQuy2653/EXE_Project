@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "vite",
     "start": "node --experimental-modules server.js",
+    "simple": "node simple-server.js",
     "server": "node --experimental-modules server.js",
-    "simple": "node --experimental-modules server.js"
+    "create-admin": "node --experimental-modules scripts/create-admin.mjs",
+    "start-env": "start.bat"
   },
   "keywords": [],
   "author": "",
@@ -16,10 +18,11 @@
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0",
+    "express": "^4.18.2",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.16.0"
+    "mongoose": "^8.16.0",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
     "vite-plugin-node": "^5.0.1"

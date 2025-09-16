@@ -3,15 +3,11 @@ import { createProduct, getAllProducts, getProductById, updateProduct, deletePro
 
 const router = express.Router();
 
-// Tạo sản phẩm mới
+// Đặt routes cụ thể trước routes có parameter
 router.post('/', createProduct);
-// Lấy danh sách sản phẩm
 router.get('/', getAllProducts);
-// Lấy sản phẩm theo id
 router.get('/:id', getProductById);
-// Cập nhật sản phẩm
 router.put('/:id', updateProduct);
-// Xóa sản phẩm
 router.delete('/:id', deleteProduct);
 
 export default router; 
