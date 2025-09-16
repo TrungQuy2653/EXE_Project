@@ -6,6 +6,7 @@ import Product from '@/app/components/Home/Product'
 import Collection from '@/app/components/Home/Collection'
 import Newsletter from '@/app/components/Home/Newsletter'
 import UserProfile from '@/app/components/Home/UserProfile'
+import AdminPanel from '@/app/components/Admin/AdminPanel'
 import { Metadata } from 'next'
 import ContactForm from './components/Contact/Form'
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
+      <AdminPanel />
       <Features />
       <Collection />
       <Product />

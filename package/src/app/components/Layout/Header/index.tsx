@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import Logo from './Logo'
 import HeaderLink from './Navigation/HeaderLink'
@@ -10,12 +10,12 @@ import { Icon } from '@iconify/react/dist/iconify.js'
 import { HeaderItem } from '@/app/types/menu'
 import { useAuth } from '@/contexts/AuthContext'
 import AuthModal from '@/app/components/Auth/AuthModal'
-import Toast from '@/components/Common/Toast'
 
 const Header: React.FC = () => {
   const [headerLink, setHeaderLink] = useState<HeaderItem[]>([])
   const router = useRouter()
-  const { user, logout, toast, hideToast } = useAuth()
+  const pathname = usePathname()
+  const { user, logout } = useAuth()
 
   const [navbarOpen, setNavbarOpen] = useState(false)
   const [sticky, setSticky] = useState(false)
@@ -29,19 +29,19 @@ const Header: React.FC = () => {
     // Sử dụng data tĩnh thay vì fetch API
     const staticHeaderData = [
       {
-        name: "Trang chủ",
+        label: "Trang chủ",
         href: "/"
       },
       {
-        name: "Về chúng tôi", 
+        label: "Về chúng tôi", 
         href: "/about"
       },
       {
-        name: "Dịch vụ",
+        label: "Dịch vụ",
         href: "/services"
       },
       {
-        name: "Liên hệ",
+        label: "Liên hệ",
         href: "/contact"
       }
     ]
@@ -79,6 +79,13 @@ const Header: React.FC = () => {
       document.body.style.overflow = ''
     }
   }, [authModalOpen, navbarOpen])
+
+  // Hide header on admin dashboard, mystery box, and inventory pages
+  const shouldHideHeader = pathname?.startsWith('/admin') || pathname === '/mystery-box' || pathname === '/inventory'
+  
+  if (shouldHideHeader) {
+    return null
+  }
 
   return (
     <header
@@ -309,15 +316,6 @@ const Header: React.FC = () => {
                mode={authMode}
              />
              
-             {/* Toast Notification */}
-             {toast && (
-               <Toast
-                 message={toast.message}
-                 type={toast.type}
-                 isVisible={toast.isVisible}
-                 onClose={hideToast}
-               />
-             )}
            </header>
   )
 }

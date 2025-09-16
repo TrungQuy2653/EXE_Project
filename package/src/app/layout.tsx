@@ -4,6 +4,7 @@ import Header from '@/app/components/Layout/Header'
 import Footer from '@/app/components/Layout/Footer'
 import ScrollToTop from '@/app/components/ScrollToTop'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { BackendStatus } from '@/components/BackendStatus'
 const font = Merienda ({
   subsets: ['vietnamese'],
   weight: ['400'],
@@ -16,14 +17,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <body className={`${font.className}`}>
-        <AuthProvider>
-          <Header />
-          {children}
-          <Footer />
-          <ScrollToTop />
-        </AuthProvider>
-      </body>
+             <body className={`${font.className}`}>
+         <AuthProvider>
+           <BackendStatus />
+           <Header />
+           {children}
+           <Footer />
+           <ScrollToTop />
+         </AuthProvider>
+       </body>
     </html>
   )
 }

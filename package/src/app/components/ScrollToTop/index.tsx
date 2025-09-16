@@ -1,9 +1,11 @@
 'use client'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 export default function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false)
+  const pathname = usePathname()
 
   // Top: 0 takes us all the way back to the top of the page
   // Behavior: smooth keeps it smooth!
@@ -28,6 +30,13 @@ export default function ScrollToTop() {
 
     return () => window.removeEventListener('scroll', toggleVisibility)
   }, [])
+
+  // Hide scroll-to-top on admin dashboard and mystery box pages
+  const shouldHideScrollToTop = pathname?.startsWith('/admin') || pathname === '/mystery-box'
+  
+  if (shouldHideScrollToTop) {
+    return null
+  }
 
   return (
     <div className='fixed bottom-8 right-8 z-999'>
