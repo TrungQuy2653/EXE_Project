@@ -6,6 +6,7 @@ export const connectionDB = async (uri) => {
         console.log('Kết nối MongoDB thành công!');
     } catch (error) {
         console.error('Lỗi kết nối MongoDB:', error);
-        process.exit(1);
+        console.log('Tiếp tục chạy server mà không cần database...');
+        // Không exit process để server vẫn chạy được
     }
 }; 

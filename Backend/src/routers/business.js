@@ -4,6 +4,7 @@ import {isAdmin} from '../controllers/auth.js';
 
 const router = express.Router();
 
+// Đặt routes cụ thể trước routes có parameter
 router.post('/signup', signupBusiness);
 router.post('/signin', signinBusiness);
 router.get('/businesses', isAdmin, getAllBusinesses);
