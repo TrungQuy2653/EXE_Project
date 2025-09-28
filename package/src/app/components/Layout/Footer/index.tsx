@@ -3,11 +3,13 @@
 import React, { FC, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
+import { usePathname } from 'next/navigation'
 import Logo from '../Header/Logo'
 import { FooterLinkType } from '@/app/types/footerlink'
 
 const Footer: FC = () => {
   const [footerlink, SetFooterlink] = useState<FooterLinkType[]>([])
+  const pathname = usePathname()
 
   useEffect(() => {
     // Sử dụng data tĩnh thay vì fetch API
@@ -32,6 +34,13 @@ const Footer: FC = () => {
     
     SetFooterlink(staticFooterData)
   }, [])
+
+  // Hide footer on admin dashboard and mystery box pages
+  const shouldHideFooter = pathname?.startsWith('/admin') || pathname === '/mystery-box'
+  
+  if (shouldHideFooter) {
+    return null
+  }
 
   return (
     <footer className='bg-primary/10 pt-8'>

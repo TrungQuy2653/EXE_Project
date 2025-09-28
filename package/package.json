@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup": "setup.bat",
+    "install-deps": "npm install",
+    "check-env": "node -e \"console.log('Environment check:'); console.log('NODE_ENV:', process.env.NODE_ENV || 'not set'); console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL || 'not set'); console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL || 'not set');\""
   },
   "dependencies": {
     "@iconify/icons-ion": "^1.2.10",

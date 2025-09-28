@@ -1,153 +1,327 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import apiService from '@/services/api';
+import { useRouter } from 'next/navigation';
 
-interface User {
+// Types
+export interface User {
   _id: string;
+  id?: string; // Để tương thích với code cũ
   username: string;
   email: string;
-  avatar?: string;
-  role?: string;
-  isVerified?: boolean;
+  role: string;
   createdAt?: string;
-  updatedAt?: string;
+}
+
+interface LoginResponse {
+  message: string;
+  data: {
+    id: string;
+    username: string;
+    email: string;
+    role: string;
+  };
+  token: string;
+}
+
+interface RegisterResponse {
+  message: string;
+  data: {
+    id: string;
+    username: string;
+    email: string;
+    role: string;
+  };
+  token: string;
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  loading: boolean;
-  toast: { message: string; type: 'success' | 'error' | 'info'; isVisible: boolean } | null;
-  showToast: (message: string, type: 'success' | 'error' | 'info') => void;
-  hideToast: () => void;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string, confirmpassword: string) => Promise<void>;
   logout: () => void;
-  updateUser: (userData: Partial<User>) => void;
+  showToast: (message: string, type: 'success' | 'error' | 'info') => void;
 }
 
+// Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+// Toast component
+const Toast: React.FC<{ message: string; type: 'success' | 'error' | 'info'; onClose: () => void }> = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+
+  return (
+    <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white ${bgColor} min-w-80`}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <span className="text-lg">{icon}</span>
+          <span>{message}</span>
+        </div>
+        <button onClick={onClose} className="ml-4 text-white hover:text-gray-200">
+          ✕
+        </button>
+      </div>
+    </div>
+  );
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+// AuthProvider component
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; isVisible: boolean } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const router = useRouter();
 
-  // Check for existing token on mount
+  // Show toast function
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type });
+  };
+
+  // Check if user is logged in on mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
-      fetchUser(storedToken);
-    } else {
-      setLoading(false);
-    }
+    const checkAuth = async () => {
+      try {
+        const storedToken = localStorage.getItem('token');
+        if (storedToken) {
+          console.log('🔍 Checking stored token...');
+          
+          // Decode JWT token to get user info
+          try {
+            const tokenParts = storedToken.split('.');
+            if (tokenParts.length === 3) {
+              const payload = JSON.parse(atob(tokenParts[1]));
+              const currentTime = Math.floor(Date.now() / 1000);
+              
+              // Check if token is expired
+              if (payload.exp && payload.exp < currentTime) {
+                console.log('❌ Token expired');
+                localStorage.removeItem('token');
+                setIsLoading(false);
+                return;
+              }
+              
+              // Set user from token payload
+              if (payload.id && payload.username && payload.email) {
+                console.log('✅ Token valid, setting user:', payload.username);
+                setUser({
+                  _id: payload.id,
+                  id: payload.id,
+                  username: payload.username,
+                  email: payload.email,
+                  role: payload.role || 'user'
+                });
+                setToken(storedToken);
+                setIsLoading(false);
+                return;
+              }
+            }
+          } catch (decodeError) {
+            console.log('❌ Token decode error:', decodeError);
+          }
+          
+          // If token decode fails, try to verify with backend
+          try {
+            const response = await fetch('http://localhost:5000/api/verify-token', {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json',
+              },
+            });
+
+            if (response.ok) {
+              const userData = await response.json();
+              setUser({
+                _id: userData.id,
+                id: userData.id,
+                username: userData.username,
+                email: userData.email,
+                role: userData.role
+              });
+              setToken(storedToken);
+            } else {
+              console.log('❌ Token verification failed');
+              localStorage.removeItem('token');
+            }
+          } catch (apiError) {
+            console.log('❌ API verification failed, using token decode');
+            // Token decode already handled above
+          }
+        }
+      } catch (error) {
+        console.error('❌ Auth check error:', error);
+        localStorage.removeItem('token');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
-  const fetchUser = async (authToken: string) => {
-    try {
-      // Backend không có /me endpoint, tạm thời bỏ qua
-      console.log('⚠️ Backend không có /me endpoint, bỏ qua fetchUser');
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      localStorage.removeItem('token');
-      setToken(null);
-      setLoading(false);
-    }
-  };
-
+  // Login function
   const login = async (email: string, password: string) => {
     try {
-      const response = await apiService.login(email, password);
-      console.log('🔐 Login response:', response);
+      console.log('🔐 Attempting login for:', email);
       
-      // Kiểm tra response format
-      if (!response || !response.token || !response.data) {
-        throw new Error('Response không đúng format từ server');
+      const response = await fetch('http://localhost:5000/api/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      console.log('📡 Login response status:', response.status);
+      console.log('📡 Login response headers:', response.headers);
+
+      if (!response.ok) {
+        let errorMessage = 'Đăng nhập thất bại';
+        let responseData: any = null;
+        
+        try {
+          // Clone the response to avoid "body stream already read" error
+          const responseClone = response.clone();
+          responseData = await responseClone.json();
+          // Handle different error response formats from backend
+          if (responseData.errors && Array.isArray(responseData.errors)) {
+            errorMessage = responseData.errors.join(', ');
+          } else if (responseData.error) {
+            errorMessage = responseData.error;
+          } else if (responseData.message) {
+            errorMessage = responseData.message;
+          }
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError);
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
+
+      const data: LoginResponse = await response.json();
+      console.log('✅ Login successful:', data.data.username, 'Role:', data.data.role);
       
-      // Backend trả về { token, data: { id, username, email, role } }
-      const { token: authToken, data: userData } = response;
-      
-      // Tạo user object từ data
-      const user = {
-        _id: userData.id,
-        username: userData.username,
-        email: userData.email,
-        role: userData.role,
-        isVerified: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+      // Transform backend response to frontend format
+      const userData = {
+        _id: data.data.id,
+        id: data.data.id,
+        username: data.data.username,
+        email: data.data.email,
+        role: data.data.role
       };
       
-      setUser(user);
-      setToken(authToken);
-      localStorage.setItem('token', authToken);
+      setUser(userData);
+      setToken(data.token);
+      localStorage.setItem('token', data.token);
+
       showToast('Đăng nhập thành công! Chào mừng bạn trở lại! 🎉', 'success');
+
+      // Redirect based on role
+      if (data.data.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/');
+      }
     } catch (error: any) {
+      console.error('❌ Login error:', error);
       showToast(error.message || 'Đăng nhập thất bại! Vui lòng kiểm tra email và mật khẩu.', 'error');
-      throw new Error(error.message || 'Login failed');
+      throw error;
     }
   };
 
+  // Register function
   const register = async (username: string, email: string, password: string, confirmpassword: string) => {
     try {
-      console.log('🚀 Starting registration...', { username, email, password: '***', confirmpassword: '***' });
+      console.log('📝 Attempting register for:', username, email);
       
-      const response = await apiService.register({ username, email, password, confirmpassword });
-      console.log('✅ Registration response:', response);
-      
-      // Kiểm tra response format
-      if (!response || !response.data || !response.token) {
-        throw new Error('Response không đúng format từ server');
+      const response = await fetch('http://localhost:5000/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password, confirmpassword }),
+      });
+
+      console.log('📡 Register response status:', response.status);
+      console.log('📡 Register response headers:', response.headers);
+
+      if (!response.ok) {
+        let errorMessage = 'Đăng ký thất bại';
+        let responseData: any = null;
+        
+        try {
+          // Clone the response to avoid "body stream already read" error
+          const responseClone = response.clone();
+          responseData = await responseClone.json();
+          // Handle different error response formats from backend
+          if (responseData.errors && Array.isArray(responseData.errors)) {
+            errorMessage = responseData.errors.join(', ');
+          } else if (responseData.error) {
+            errorMessage = responseData.error;
+          } else if (responseData.message) {
+            errorMessage = responseData.message;
+          }
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError);
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
+
+      const data: RegisterResponse = await response.json();
+      console.log('✅ Register successful:', data.data.username, 'Role:', data.data.role);
       
-      // Backend trả về { message, data: { id, username, email, role }, token }
-      const { data: userData, token: authToken } = response;
-      
-      // Tạo user object từ data
-      const user = {
-        _id: userData.id,
-        username: userData.username,
-        email: userData.email,
-        role: userData.role,
-        isVerified: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+      // Transform backend response to frontend format
+      const userData = {
+        _id: data.data.id,
+        id: data.data.id,
+        username: data.data.username,
+        email: data.data.email,
+        role: data.data.role
       };
       
-      setUser(user);
-      setToken(authToken);
-      localStorage.setItem('token', authToken);
-      
-      console.log('🎉 Registration successful!');
+      setUser(userData);
+      setToken(data.token);
+      localStorage.setItem('token', data.token);
+
       showToast('Đăng ký thành công! Chào mừng bạn đến với EXE Project! 🎉', 'success');
+
+      // Redirect based on role
+      if (data.data.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/');
+      }
     } catch (error: any) {
-      console.error('❌ Registration error:', error);
+      console.error('❌ Register error:', error);
       showToast(error.message || 'Đăng ký thất bại! Vui lòng thử lại.', 'error');
-      throw new Error(error.message || 'Registration failed');
+      throw error;
     }
   };
 
+  // Logout function
   const logout = async () => {
     try {
       if (token) {
-        await apiService.logout(token);
+        await fetch('http://localhost:5000/api/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -155,39 +329,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       setToken(null);
       localStorage.removeItem('token');
+      router.push('/');
+      showToast('Đăng xuất thành công! 👋', 'success');
     }
-  };
-
-  const updateUser = (userData: Partial<User>) => {
-    if (user) {
-      setUser({ ...user, ...userData });
-    }
-  };
-
-  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
-    setToast({ message, type, isVisible: true });
-  };
-
-  const hideToast = () => {
-    setToast({ ...toast!, isVisible: false });
   };
 
   const value: AuthContextType = {
     user,
     token,
-    loading,
-    toast,
-    showToast,
-    hideToast,
+    isLoading,
     login,
     register,
     logout,
-    updateUser
+    showToast,
   };
 
   return (
     <AuthContext.Provider value={value}>
       {children}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </AuthContext.Provider>
   );
+};
+
+// Custom hook to use auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

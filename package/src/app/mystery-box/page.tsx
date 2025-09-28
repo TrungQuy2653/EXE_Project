@@ -1,232 +1,548 @@
-'use client'
-import { useRef, useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Icon } from '@iconify/react'
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
+
+interface ChessPiece {
+  _id: string;
+  name: string;
+  type: string;
+  rarity: string;
+  image: string;
+  description: string;
+  stats: {
+    attack: number;
+    defense: number;
+    speed: number;
+  };
+  dropRate: number;
+}
+
+interface Banner {
+  _id: string;
+  name: string;
+  description: string;
+  coverImage: string;
+  theme: string;
+  totalChessPieces: number;
+  rarityDistribution: {
+    common: number;
+    rare: number;
+    epic: number;
+    legendary: number;
+  };
+  releaseDate: string;
+}
+
+interface WonItem {
+  chessPiece: {
+    _id: string;
+    name: string;
+    type: string;
+    rarity: string;
+    image: string;
+    description: string;
+    stats: {
+      attack: number;
+      defense: number;
+      speed: number;
+    };
+  };
+  banner: {
+    _id: string;
+    name: string;
+    theme: string;
+  };
+  obtainedAt: string;
+  level: number;
+  experience: number;
+}
+
+interface InventoryStats {
+  totalItems: number;
+  boxesOpened: number;
+  lastOpenedBox: string | null;
+}
 
 export default function MysteryBoxPage() {
-  const [spinning, setSpinning] = useState(false)
-  const [result, setResult] = useState<string | null>(null)
-  const [showResult, setShowResult] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const { user, token } = useAuth();
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isOpeningBox, setIsOpeningBox] = useState(false);
+  const [wonItem, setWonItem] = useState<WonItem | null>(null);
+  const [showWonModal, setShowWonModal] = useState(false);
+  const [inventoryStats, setInventoryStats] = useState<InventoryStats | null>(null);
+  const [backendError, setBackendError] = useState<string | null>(null);
 
-  const skins = [
-    { name: 'AK-47 | Redline', color: '#8847ff', rarity: 'Legendary' },
-    { name: 'M4A1-S | Hyper Beast', color: '#eb4b4b', rarity: 'Epic' },
-    { name: 'AWP | Asiimov', color: '#eb4b4b', rarity: 'Epic' },
-    { name: 'P250 | Supernova', color: '#5e98d9', rarity: 'Rare' },
-    { name: 'UMP-45 | Labyrinth', color: '#b0c3d9', rarity: 'Common' },
-    { name: '★ Karambit | Fade', color: '#ffd700', rarity: 'Mythical' },
-    { name: 'Desert Eagle | Golden Koi', color: '#ff6b35', rarity: 'Epic' },
-    { name: 'Glock-18 | Water Elemental', color: '#4ecdc4', rarity: 'Rare' },
-  ]
+  // Fetch banners từ API
+  useEffect(() => {
+    checkBackendHealth();
+  }, []);
 
-  const ITEM_WIDTH = 300
-  const SPIN_DURATION = 8000 // 8 giây
+  // Fetch inventory stats chỉ khi user đã đăng nhập
+  useEffect(() => {
+    if (user && token) {
+      fetchInventoryStats();
+    }
+  }, [user, token]);
 
-  const startOpening = () => {
-    if (!containerRef.current) return
-
-    setSpinning(true)
-    setResult(null)
-    setShowResult(false)
-
-    const container = containerRef.current
-    const containerWidth = container.offsetWidth
-
-    // Scroll từ phải sang trái, tạo danh sách dài
-    const fullSkins = [...skins, ...skins, ...skins, ...skins, ...skins]
-    const totalWidth = fullSkins.length * ITEM_WIDTH
-
-    // Random vị trí dừng sao cho phần tử đúng giữa màn hình
-    const stopIndex = Math.floor(Math.random() * skins.length) + skins.length * 2
-    const targetOffset = stopIndex * ITEM_WIDTH - containerWidth / 2 + ITEM_WIDTH / 2
-
-    const start = performance.now()
-    const animate = (time: number) => {
-      const elapsed = time - start
-      const progress = Math.min(elapsed / SPIN_DURATION, 1)
-      const easeOutExpo = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
-      container.scrollLeft = targetOffset * easeOutExpo
-
-      if (progress < 1) {
-        requestAnimationFrame(animate)
+  const checkBackendHealth = async () => {
+    try {
+      console.log('🏥 Checking backend health...');
+      const response = await fetch('http://localhost:5000/health');
+      
+      if (response.ok) {
+        console.log('✅ Backend is healthy');
+        fetchBanners(); // Chỉ fetch banners khi backend healthy
       } else {
-        const resultIndex = Math.floor((container.scrollLeft + containerWidth / 2) / ITEM_WIDTH)
-        const finalSkin = fullSkins[resultIndex]
-        setResult(finalSkin.name)
-        setSpinning(false)
-        setShowResult(true)
+        console.error('❌ Backend health check failed:', response.status);
+        setBackendError('Backend không phản hồi. Vui lòng kiểm tra backend!');
+        setLoading(false);
       }
+    } catch (error) {
+      console.error('❌ Cannot connect to backend:', error);
+      setBackendError('Không thể kết nối đến backend. Vui lòng kiểm tra backend!');
+      setLoading(false);
+    }
+  };
+
+  const fetchBanners = async () => {
+    try {
+      setBackendError(null); // Reset error state
+      console.log('📡 Fetching active banners...');
+      const response = await fetch('http://localhost:5000/api/banners/active');
+      console.log('📡 Banners response status:', response.status);
+      
+      if (response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          console.log('✅ Banners fetched successfully:', data);
+          
+          if (data.success && data.banners) {
+            console.log('📊 Raw banners data:', data.banners);
+            console.log('📊 Number of banners:', data.banners.length);
+            
+            // Debug từng banner
+            data.banners.forEach((banner, index) => {
+              console.log(`📋 Banner ${index + 1}:`, {
+                name: banner.name,
+                coverImage: banner.coverImage,
+                theme: banner.theme,
+                isActive: banner.isActive,
+                totalChessPieces: banner.totalChessPieces
+              });
+            });
+            
+            setBanners(data.banners);
+          } else {
+            console.error('❌ Invalid response format:', data);
+            setBackendError('Server trả về dữ liệu không đúng định dạng. Vui lòng kiểm tra backend!');
+          }
+        } else {
+          console.error('❌ Response is not JSON:', contentType);
+          const responseText = await response.text();
+          console.error('❌ Response text:', responseText);
+          setBackendError('Server trả về dữ liệu không đúng định dạng. Vui lòng kiểm tra backend!');
+        }
+      } else {
+        try {
+          const errorData = await response.json();
+          console.error('❌ Error fetching banners:', response.status, errorData);
+          const errorMessage = errorData.errors?.[0] || errorData.message || 'Không thể tải banners';
+          setBackendError(`Lỗi khi tải banners: ${errorMessage}`);
+        } catch (parseError) {
+          console.error('❌ Cannot parse error response:', parseError);
+          const responseText = await response.text();
+          console.error('❌ Response text:', responseText);
+          setBackendError(`Lỗi khi tải banners: HTTP ${response.status}`);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Network error fetching banners:', error);
+      setBackendError('Lỗi kết nối khi tải banners! Vui lòng kiểm tra kết nối mạng và backend.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchInventoryStats = async () => {
+    try {
+      console.log('📡 Fetching inventory stats...');
+      const response = await fetch('http://localhost:5000/api/mystery-box/inventory/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      console.log('📡 Inventory stats response status:', response.status);
+      
+      if (response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          console.log('✅ Inventory stats fetched successfully:', data);
+          setInventoryStats({
+            totalItems: data.totalItems,
+            boxesOpened: data.boxesOpened,
+            lastOpenedBox: data.lastOpenedBox
+          });
+        } else {
+          console.error('❌ Inventory stats response is not JSON:', contentType);
+          // Không hiển thị alert cho inventory stats vì không quan trọng lắm
+        }
+      } else {
+        try {
+          const errorData = await response.json();
+          console.error('❌ Error fetching inventory stats:', response.status, errorData);
+          // Không hiển thị alert cho inventory stats vì không quan trọng lắm
+        } catch (parseError) {
+          console.error('❌ Cannot parse inventory stats error response:', parseError);
+          // Không hiển thị alert cho inventory stats vì không quan trọng lắm
+        }
+      }
+    } catch (error) {
+      console.error('❌ Network error fetching inventory stats:', error);
+      // Không hiển thị alert cho inventory stats vì không quan trọng lắm
+    }
+  };
+
+  const openMysteryBox = async (bannerId: string) => {
+    if (!user || !token) {
+      alert('Vui lòng đăng nhập để mở hộp!');
+      return;
     }
 
-    requestAnimationFrame(animate)
-  }
+    setIsOpeningBox(true);
+    try {
+      console.log('🎁 Opening mystery box for banner:', bannerId);
+      console.log('🔑 Using token:', token ? 'Valid token' : 'No token');
+      
+      const response = await fetch(`http://localhost:5000/api/mystery-box/open/${bannerId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response headers:', response.headers);
+
+      if (response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          console.log('✅ Mystery box opened successfully:', data);
+          setWonItem(data.wonItem);
+          setShowWonModal(true);
+          setInventoryStats(data.inventoryStats);
+        } else {
+          console.error('❌ Response is not JSON:', contentType);
+          const responseText = await response.text();
+          console.error('❌ Response text:', responseText);
+          alert('Lỗi: Server trả về dữ liệu không đúng định dạng. Vui lòng kiểm tra backend!');
+        }
+      } else {
+        try {
+          const errorData = await response.json();
+          console.error('❌ Error response:', errorData);
+          const errorMessage = errorData.errors?.[0] || errorData.message || 'Lỗi khi mở hộp!';
+          alert(`Lỗi: ${errorMessage}`);
+        } catch (parseError) {
+          console.error('❌ Cannot parse error response:', parseError);
+          const responseText = await response.text();
+          console.error('❌ Response text:', responseText);
+          alert(`Lỗi khi mở hộp: HTTP ${response.status}`);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Network error opening mystery box:', error);
+      alert('Lỗi kết nối khi mở hộp! Vui lòng kiểm tra kết nối mạng và backend.');
+    } finally {
+      setIsOpeningBox(false);
+    }
+  };
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
-      case 'Mythical': return 'text-yellow-500'
-      case 'Legendary': return 'text-purple-500'
-      case 'Epic': return 'text-red-500'
-      case 'Rare': return 'text-blue-500'
-      case 'Common': return 'text-gray-500'
-      default: return 'text-gray-500'
+      case 'common': return 'text-gray-600';
+      case 'rare': return 'text-blue-600';
+      case 'epic': return 'text-purple-600';
+      case 'legendary': return 'text-yellow-600';
+      default: return 'text-gray-600';
     }
-  }
+  };
 
-  const getSkinByName = (name: string) => {
-    return skins.find(skin => skin.name === name)
+  const getRarityText = (rarity: string) => {
+    switch (rarity) {
+      case 'common': return 'Thường';
+      case 'rare': return 'Hiếm';
+      case 'epic': return 'Epic';
+      case 'legendary': return 'Huyền thoại';
+      default: return rarity;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Đang kiểm tra backend...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition">
-              <Icon icon="material-symbols:arrow-back" className="text-2xl text-primary" />
-              <span className="text-lg font-semibold text-gray-700">Quay lại trang chủ</span>
-            </Link>
-            <h1 className="text-2xl font-bold text-primary">🎁 Mystery Box</h1>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">🎁 Mystery Box</h1>
+              <p className="mt-2 text-gray-600">Mở hộp để nhận quân cờ độc đáo!</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/"
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-200"
+              >
+                🏠 Trang chủ
+              </Link>
+              {inventoryStats && (
+                <div className="text-right">
+                  <p className="text-sm text-gray-600">Tổng items: <span className="font-semibold">{inventoryStats.totalItems}</span></p>
+                  <p className="text-sm text-gray-600">Hộp đã mở: <span className="font-semibold">{inventoryStats.boxesOpened}</span></p>
+                </div>
+              )}
+              <Link 
+                href="/inventory"
+                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                📦 Inventory
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            Mở Hòm Bí Ẩn
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Hãy thử vận may của bạn! Mỗi lần mở hòm sẽ cho bạn một phần thưởng ngẫu nhiên.
-            Bạn có thể nhận được những vật phẩm hiếm và giá trị!
-          </p>
-        </div>
-
-        {/* Mystery Box Container */}
-        <div className="max-w-6xl mx-auto">
-          <div className="relative w-full h-[400px] mx-auto mb-8">
-            {/* Container scroll */}
-            <div
-              ref={containerRef}
-              className="relative w-full h-full overflow-hidden border-4 border-primary/30 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl shadow-2xl"
-            >
-              <div className="flex flex-row-reverse" style={{ width: skins.length * ITEM_WIDTH * 5 }}>
-                {[...skins, ...skins, ...skins, ...skins, ...skins].map((skin, i) => (
-                  <div
-                    key={i}
-                    className="w-[300px] h-[400px] flex flex-col items-center justify-center text-white font-semibold border border-primary/20 relative group"
-                    style={{ backgroundColor: skin.color }}
-                  >
-                    <div className="text-center p-4">
-                      <div className="text-2xl mb-2">🎮</div>
-                      <div className="text-lg font-bold mb-2">{skin.name}</div>
-                      <div className={`text-sm ${getRarityColor(skin.rarity)} font-semibold`}>
-                        {skin.rarity}
-                      </div>
-                    </div>
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 rounded"></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Mũi tên chỉ thị */}
-            <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-              <div className="text-red-500 text-4xl animate-bounce">▼</div>
-              <div className="text-red-500 text-sm font-bold text-center">Kết quả</div>
-            </div>
-
-            {/* Hiệu ứng ánh sáng */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute left-1/2 top-0 w-1 h-full bg-gradient-to-b from-transparent via-yellow-400 to-transparent opacity-60 animate-pulse"></div>
-            </div>
-          </div>
-
-          {/* Nút mở hòm */}
-          <div className="text-center">
+      {/* Banners Grid */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {backendError ? (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h3 className="text-xl font-semibold text-red-900 mb-2">Lỗi kết nối backend</h3>
+            <p className="text-gray-600 mb-4">{backendError}</p>
             <button
-              onClick={startOpening}
-              disabled={spinning}
-              className={`px-12 py-4 text-xl font-bold rounded-full border-2 transition-all duration-300 transform hover:scale-105 ${
-                spinning
-                  ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-primary text-white border-primary hover:bg-primary/90 hover:shadow-lg'
-              }`}
+              onClick={checkBackendHealth}
+              className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors"
             >
-              {spinning ? (
-                <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                  <span>Đang quay...</span>
-                </div>
-              ) : (
-                '🎯 MỞ HÒM NGAY!'
-              )}
+              🔄 Thử lại
             </button>
           </div>
-
-          {/* Hiển thị kết quả */}
-          {showResult && result && (
-            <div className="mt-12 text-center">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-auto border-2 border-primary/20">
-                <div className="text-6xl mb-4">🎉</div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">Chúc mừng!</h3>
-                <p className="text-lg text-gray-600 mb-4">Bạn đã nhận được:</p>
-                
-                {(() => {
-                  const skin = getSkinByName(result)
-                  return (
-                    <div className="bg-gradient-to-r from-primary/10 to-primary/20 rounded-xl p-6 border border-primary/30">
-                      <div className="text-3xl mb-2">🎮</div>
-                      <div className="text-xl font-bold text-gray-800 mb-2">{result}</div>
-                      <div className={`text-lg font-semibold ${getRarityColor(skin?.rarity || '')}`}>
-                        {skin?.rarity}
-                      </div>
-                    </div>
-                  )
-                })()}
-
-                <button
-                  onClick={() => {
-                    setShowResult(false)
-                    setResult(null)
-                  }}
-                  className="mt-6 px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary/90 transition-colors"
-                >
-                  Mở hòm tiếp theo
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Danh sách phần thưởng có thể nhận */}
-          <div className="mt-16">
-            <h3 className="text-2xl font-bold text-center text-gray-800 mb-8">
-              Các phần thưởng có thể nhận
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {skins.map((skin, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-xl p-4 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow"
-                >
-                  <div
-                    className="w-full h-32 rounded-lg mb-3 flex items-center justify-center text-white font-bold text-center"
-                    style={{ backgroundColor: skin.color }}
-                  >
-                    <div className="text-4xl">🎮</div>
-                  </div>
-                  <h4 className="font-semibold text-gray-800 mb-2 text-sm">{skin.name}</h4>
-                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${getRarityColor(skin.rarity)} bg-opacity-10`}>
-                    {skin.rarity}
-                  </span>
-                </div>
-              ))}
+        ) : banners.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🎭</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Chưa có banner nào</h3>
+            <p className="text-gray-600 mb-4">Admin cần tạo banner và thêm quân cờ trước</p>
+            <div className="space-y-2 text-sm text-gray-500">
+              <p>• Tạo banner mới trong admin panel</p>
+              <p>• Thêm quân cờ vào banner</p>
+              <p>• Kích hoạt banner để người dùng có thể mở hộp</p>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {banners.map((banner) => {
+              // Tạo URL ảnh đúng cách
+              let imageUrl = banner.coverImage;
+              
+              // Kiểm tra nếu là placeholder URL thì không thêm localhost
+              if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.includes('placeholder')) {
+                imageUrl = `http://localhost:5000${imageUrl}`;
+              }
+              
+              console.log('🖼️ Banner:', banner.name);
+              console.log('📷 CoverImage path:', banner.coverImage);
+              console.log('🌐 Full URL:', imageUrl);
+              return (
+              <div key={banner._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                {/* Banner Cover - Simplified */}
+                <div className="relative h-48 overflow-hidden bg-gray-200">
+                  {/* Main Image */}
+                  <img
+                    src={imageUrl}
+                    alt={banner.name}
+                    className="w-full h-full object-cover"
+                    onLoad={(e) => {
+                      console.log('✅ Image loaded successfully:', imageUrl);
+                      // Hide fallback when image loads
+                      const fallback = e.currentTarget.nextElementSibling;
+                      if (fallback) {
+                        fallback.style.display = 'none';
+                      }
+                    }}
+                    onError={(e) => {
+                      console.error('❌ Image failed to load:', imageUrl);
+                      console.error('Banner coverImage:', banner.coverImage);
+                      // Hide image and show fallback
+                      e.currentTarget.style.display = 'none';
+                      const fallback = e.currentTarget.nextElementSibling;
+                      if (fallback) {
+                        fallback.style.display = 'block';
+                      }
+                    }}
+                  />
+                  
+                  {/* Fallback Background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400">
+                    <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center text-white">
+                        <div className="text-4xl mb-2">🎁</div>
+                        <div className="text-lg font-bold">{banner.name}</div>
+                        <div className="text-sm opacity-90">{banner.theme}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Banner Info Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/50 to-transparent p-4">
+                    <h3 className="text-white text-lg font-bold mb-1">{banner.name}</h3>
+                    <p className="text-white/90 text-sm">{banner.theme}</p>
+                  </div>
+                  
+                  {/* Debug Info */}
+                  <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                    {banner.coverImage ? 'Has Image' : 'No Image'}
+                  </div>
+                  <div className="absolute top-2 left-2 bg-blue-500/70 text-white text-xs px-2 py-1 rounded max-w-32 truncate">
+                    {imageUrl.split('/').pop()}
+                  </div>
+                  
+                  {/* Test Link */}
+                  <div className="absolute top-12 right-2 bg-green-500/70 text-white text-xs px-2 py-1 rounded">
+                    <a href={imageUrl} target="_blank" rel="noopener noreferrer" className="text-white hover:underline">
+                      Test URL
+                    </a>
+                  </div>
+                </div>
+
+                {/* Banner Info */}
+                <div className="p-6">
+                  <p className="text-gray-600 mb-4">{banner.description || 'Không có mô tả'}</p>
+                  
+                  {/* Chess Pieces Preview */}
+                  <div className="mb-4">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2">Quân cờ có thể nhận:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="flex items-center space-x-1 bg-gray-100 px-2 py-1 rounded-full">
+                        <span className="text-xs">Tổng: {banner.totalChessPieces || 0}</span>
+                      </div>
+                      {banner.totalChessPieces === 0 ? (
+                        <div className="flex items-center space-x-1 bg-red-100 px-2 py-1 rounded-full">
+                          <span className="text-xs text-red-600">Chưa có quân cờ</span>
+                        </div>
+                      ) : (
+                        <>
+                          {banner.rarityDistribution?.common > 0 && (
+                            <div className="flex items-center space-x-1 bg-gray-100 px-2 py-1 rounded-full">
+                              <span className="text-xs text-gray-600">Thường: {banner.rarityDistribution.common}</span>
+                            </div>
+                          )}
+                          {banner.rarityDistribution?.rare > 0 && (
+                            <div className="flex items-center space-x-1 bg-blue-100 px-2 py-1 rounded-full">
+                              <span className="text-xs text-blue-600">Hiếm: {banner.rarityDistribution.rare}</span>
+                            </div>
+                          )}
+                          {banner.rarityDistribution?.epic > 0 && (
+                            <div className="flex items-center space-x-1 bg-purple-100 px-2 py-1 rounded-full">
+                              <span className="text-xs text-purple-600">Epic: {banner.rarityDistribution.epic}</span>
+                            </div>
+                          )}
+                          {banner.rarityDistribution?.legendary > 0 && (
+                            <div className="flex items-center space-x-1 bg-yellow-100 px-2 py-1 rounded-full">
+                              <span className="text-xs text-yellow-600">Huyền thoại: {banner.rarityDistribution.legendary}</span>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Open Box Button */}
+                  <button
+                    onClick={() => openMysteryBox(banner._id)}
+                    disabled={isOpeningBox || banner.totalChessPieces === 0}
+                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
+                      isOpeningBox || banner.totalChessPieces === 0
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white hover:shadow-lg'
+                    }`}
+                  >
+                    {isOpeningBox ? (
+                      <span className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Đang mở hộp...
+                      </span>
+                    ) : banner.totalChessPieces === 0 ? (
+                      <span className="flex items-center justify-center">
+                        ❌ Không thể mở hộp
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center">
+                        🎁 Mở hộp
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+              );
+            })}
+          </div>
+        )}
       </div>
+
+      {/* Won Item Modal */}
+      {showWonModal && wonItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 text-center">
+            <div className="text-6xl mb-4">🎉</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Chúc mừng!</h3>
+            <p className="text-gray-600 mb-4">Bạn đã nhận được:</p>
+            
+            {/* Won Item Display */}
+            <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-4 mb-4">
+              <div className="text-2xl mb-2">{wonItem.chessPiece.type}</div>
+              <div className={`text-lg font-bold mb-1 ${getRarityColor(wonItem.chessPiece.rarity)}`}>
+                {wonItem.chessPiece.name}
+              </div>
+              <div className="text-sm text-gray-600 mb-2">
+                {getRarityText(wonItem.chessPiece.rarity)}
+              </div>
+              <div className="text-xs text-gray-500 mb-2">
+                Từ banner: {wonItem.banner.name}
+              </div>
+              <div className="text-xs text-gray-500">
+                Level: {wonItem.level} | Exp: {wonItem.experience}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowWonModal(false)}
+              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Tuyệt vời!
+            </button>
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }
+

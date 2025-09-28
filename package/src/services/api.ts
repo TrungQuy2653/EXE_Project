@@ -81,7 +81,7 @@ class ApiService {
       }
       
       if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        throw new Error('Không thể kết nối đến server. Vui lòng kiểm tra xem backend có đang chạy không.');
+        throw new Error('❌ Không thể kết nối đến server. Vui lòng:\n1. Kiểm tra backend có đang chạy tại http://localhost:5000\n2. Chạy: cd BE/Backend && npm run simple\n3. Kiểm tra file .env có đúng cấu hình không');
       }
       
       if (error instanceof TypeError && error.message.includes('NetworkError')) {
